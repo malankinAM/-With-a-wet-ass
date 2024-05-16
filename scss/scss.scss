@@ -1,0 +1,127 @@
+:root {
+            --rotateDuration: 36s;
+            --bubbleDuration: 4s;
+          }
+          
+          body {
+            background-image: linear-gradient(
+              56deg,
+              rgba(222, 191, 244, 1),
+              rgba(255, 178, 178, 1),
+              rgba(255, 215, 158, 1),
+              rgba(222, 191, 244, 1),
+              rgba(255, 178, 178, 1),
+              rgba(255, 215, 158, 1)
+            );
+            background-size: 120em 120em;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            perspective: 800px;
+            overflow: hidden;
+            animation: background var(--rotateDuration) infinite linear;
+            
+            @keyframes background {
+              from { background-position-x: 0;  }
+              to { background-position-x: 120em;  }
+            }
+            
+            *:not(:empty) {
+              transform-style: preserve-3d;
+            }
+          }
+          
+          .scene {
+            position: relative;
+            animation: sceneRotate var(--rotateDuration) infinite linear;
+            
+            @keyframes sceneRotate {
+              from { transform: translateY(10em) rotateY(0deg); }
+              to { transform: translateY(10em) rotateY(-360deg); }
+            }
+          }
+          
+          .floor {
+            position: absolute;
+            inset: -60em;
+            background-image:
+              repeating-radial-gradient(circle at calc(cos(0deg) * 25% + 50%) calc(sin(0deg) * 25% + 50%), transparent 0, #fff2, transparent 1em),
+              repeating-radial-gradient(circle at calc(cos(72deg) * 25% + 50%) calc(sin(72deg) * 25% + 50%), transparent 0, #fff2, transparent 1em),
+              repeating-radial-gradient(circle at calc(cos(144deg) * 25% + 50%) calc(sin(144deg) * 25% + 50%), transparent 0, #fff2, transparent 1em),
+              repeating-radial-gradient(circle at calc(cos(216deg) * 25% + 50%) calc(sin(216deg) * 25% + 50%), transparent 0, #fff2, transparent 1em),
+              repeating-radial-gradient(circle at calc(cos(288deg) * 25% + 50%) calc(sin(288deg) * 25% + 50%), transparent 0, #fff2, transparent 1em);
+            transform: rotateX(90deg);
+          }
+          
+          .foam {
+            position: absolute;
+            
+            i {
+              position: absolute;
+              inset: -5em; 
+              background: radial-gradient(closest-side, #fff, transparent);
+              animation: foam var(--rotateDuration) infinite linear;
+          
+              @keyframes foam {
+                from { transform: rotateY(var(--angle)) translateZ(var(--translateZ)) rotateY(calc(var(--angle) * -1)) scale(var(--scale)); }
+                to { transform: rotateY(var(--angle)) translateZ(var(--translateZ)) rotateY(calc(var(--angle) * -1 + 360deg)) scale(var(--scale)); }
+              }
+          
+              @for $i from 0 to 24 {
+                &:nth-child(#{$i + 1}) {
+                  $angle: random(360);
+                  --angle: #{$angle}deg;
+                  --translateZ: #{random(100) / 20 + 5}em;
+                  --scale: #{random(100) / 500 + 1};
+                }
+              }
+            } 
+          }
+          
+          .bubble {
+            position: absolute;
+            animation:
+              bubbleTop var(--bubbleDuration) calc(var(--bubbleDuration) * var(--f)) infinite ease-out both,
+              bubbleRotate var(--rotateDuration) infinite linear;
+            
+            @keyframes bubbleTop {
+              0% { translate: 0 0 0; scale: 0; }
+              10%, 100% { translate: var(--translate); scale: 1; }
+            }
+            @keyframes bubbleRotate {
+              from { rotate: y 0deg; }
+              to { rotate: y 360deg; }
+            }
+          
+            @for $i from 0 to 48 {
+              &:nth-child(#{$i + 1}) {
+                --f: #{$i / 48};
+                --color: hsl(#{random(360)} 100% 50% / 0.4);
+                --scale: #{random(100) / 100 + 0.7};
+                --translate: #{random(200) / 10 - 10}em 0 #{random(200) / 10 - 10}em;
+                --top: -#{random(100) / 5 + 10}em;
+              }
+            }
+            
+            i {
+              position: absolute;
+              inset: -2em;
+              background-image:
+                radial-gradient(closest-side, transparent ,99%, #fff),
+                radial-gradient(closest-side, #fff7, 75%, var(--color));
+              border-radius: 50%;
+              transform: rotateY(0deg) translateY(-50%) scale(var(--scale));
+              animation:
+                bubbleTranslate var(--bubbleDuration) calc(var(--bubbleDuration) * var(--f)) infinite linear,
+                bubbleSwing 1s calc(-3.6s * var(--f)) infinite ease-in-out alternate;
+          
+              @keyframes bubbleTranslate {
+                from { translate: 0 0; }
+                to { translate: 0 var(--top); opacity: 0; }
+              }
+              @keyframes bubbleSwing {
+                from { rotate: 20deg; }
+                to { rotate: -20deg; }
+              }
+            }
+          }
